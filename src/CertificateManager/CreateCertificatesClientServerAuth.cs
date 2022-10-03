@@ -116,6 +116,7 @@ namespace CertificateManager
             return intermediateCert;
         }
 
+
         /// <summary>
         /// Create an device chained certificate for Client and Server TLS Auth
         /// 
@@ -140,6 +141,35 @@ namespace CertificateManager
             return NewDeviceChainedCertificate(distinguishedName,
                 validityPeriod, dnsName, enhancedKeyUsages, parentCertificateAuthority);
         }
+
+
+        /// <summary>
+        /// Create an device chained certificate for Client and Server TLS Auth
+        /// 
+        /// The device certificate (also called a leaf certificate) must have the Subject Name set to the Device ID that was used when registering the IoT device in the Azure IoT Hub. This setting is required for authentication.
+        /// </summary>
+        /// <param name="distinguishedName">Distinguished Name used for the subject and the issuer properties</param>
+        /// <param name="validityPeriod">Valid from, Valid to certificate properties</param>
+        /// <param name="subjectAlternativeName"> Dns of Ipadresses or other alternative names (used to combine certificates for both multiple hostnames and ipaddresses</param>
+        /// <param name="parentCertificateAuthority"> Parent cert to create the chain from</param>
+        /// <returns>X509Certificate2 device chained certificate</returns>
+        public X509Certificate2 NewDeviceChainedCertificate(
+           DistinguishedName distinguishedName,
+           ValidityPeriod validityPeriod,
+          SubjectAlternativeName subjectAlternativeName,
+           X509Certificate2 parentCertificateAuthority)
+        {
+            var enhancedKeyUsages = new OidCollection {
+                OidLookup.ClientAuthentication,
+                OidLookup.ServerAuthentication
+            };
+
+            return NewDeviceChainedCertificate(distinguishedName,
+                validityPeriod, subjectAlternativeName, enhancedKeyUsages, parentCertificateAuthority);
+        }
+
+
+
 
         /// <summary>
         /// Create an device chained certificate for Client and Server TLS Auth using RSA algorithm
@@ -211,6 +241,56 @@ namespace CertificateManager
             return NewDeviceChainedCertificate(distinguishedName,
                 validityPeriod, dnsName, enhancedKeyUsages, parentCertificateAuthority);
         }
+
+        /// <summary>
+        /// Create an server chained certificate for Client and Server TLS Auth
+        /// </summary>
+        /// <param name="distinguishedName">Distinguished Name used for the subject and the issuer properties</param>
+        /// <param name="validityPeriod">Valid from, Valid to certificate properties</param>
+        /// <param name="subjectAlternativeName"> Dns of Ipadresses or other alternative names (used to combine certificates for both multiple hostnames and ipaddresses</param>
+        /// <param name="parentCertificateAuthority"> Parent cert to create the chain from</param>
+        /// <returns>X509Certificate2 server chained certificate</returns>
+        public X509Certificate2 NewClientChainedCertificate(
+           DistinguishedName distinguishedName,
+           ValidityPeriod validityPeriod,
+           SubjectAlternativeName subjectAlternativeName,
+           X509Certificate2 parentCertificateAuthority)
+        {
+            var enhancedKeyUsages = new OidCollection {
+                OidLookup.ClientAuthentication
+            };
+
+            return NewDeviceChainedCertificate(distinguishedName,
+                validityPeriod, subjectAlternativeName, enhancedKeyUsages, parentCertificateAuthority);
+        }
+
+
+
+
+        /// <summary>
+        /// Create an client chained certificate for Client and Server TLS Auth
+        /// </summary>
+        /// <param name="distinguishedName">Distinguished Name used for the subject and the issuer properties</param>
+        /// <param name="validityPeriod">Valid from, Valid to certificate properties</param>
+        /// <param name="subjectAlternativeName"> Dns of Ipadresses or other alternative names (used to combine certificates for both multiple hostnames and ipaddresses</param>
+        /// <param name="parentCertificateAuthority"> Parent cert to create the chain from</param>
+        /// <returns>X509Certificate2 client chained certificate</returns>
+        public X509Certificate2 NewServerChainedCertificate(
+           DistinguishedName distinguishedName,
+           ValidityPeriod validityPeriod,
+          SubjectAlternativeName subjectAlternativeName,
+           X509Certificate2 parentCertificateAuthority)
+        {
+            var enhancedKeyUsages = new OidCollection {
+                OidLookup.ServerAuthentication
+            };
+
+            return NewDeviceChainedCertificate(distinguishedName,
+                validityPeriod, subjectAlternativeName, enhancedKeyUsages, parentCertificateAuthority);
+        }
+
+
+
 
         /// <summary>
         /// Create an client chained certificate for Client and Server TLS Auth
@@ -312,6 +392,43 @@ namespace CertificateManager
 
             return clientCertSelfSigned;
         }
+
+
+
+
+        private X509Certificate2 NewDeviceChainedCertificate(
+           DistinguishedName distinguishedName,
+           ValidityPeriod validityPeriod,
+           SubjectAlternativeName subjectAlternativeName,
+           OidCollection enhancedKeyUsages,
+           X509Certificate2 parentCertificateAuthority)
+        {
+            var basicConstraints = new BasicConstraints
+            {
+                CertificateAuthority = false,
+                HasPathLengthConstraint = false,
+                PathLengthConstraint = 0,
+                Critical = true
+            };
+
+
+            var x509KeyUsageFlags =
+              X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment;
+
+            var deviceCert = _createCertificates.NewECDsaChainedCertificate(
+                distinguishedName,
+                basicConstraints,
+                validityPeriod,
+                subjectAlternativeName,
+                parentCertificateAuthority,
+                enhancedKeyUsages,
+                x509KeyUsageFlags,
+                new ECDsaConfiguration());
+
+            return deviceCert;
+        }
+
+
 
         private X509Certificate2 NewDeviceChainedCertificate(
            DistinguishedName distinguishedName,
