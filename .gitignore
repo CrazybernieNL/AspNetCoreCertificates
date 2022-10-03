@@ -8,3 +8,5 @@
 /examplesUsingCertificateAuthentication/AspNetCoreChained/_chainedServerLogs.txt
 /examplesUsingCertificateAuthentication/AspNetCoreChained/_clientLogs.txt
 /examplesUsingCertificateAuthentication/AzureCertAuth/certauth.txt
+/src/CertificateManager/CertificateManager.1.0.9.nupkg
+/src/CertificateManager/CertificateManager.1.0.9.snupkg

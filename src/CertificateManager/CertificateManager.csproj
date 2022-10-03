@@ -15,7 +15,7 @@
     <Copyright>2022 damienbod</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>damienbod</Authors>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
